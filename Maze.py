@@ -124,6 +124,15 @@ class Maze:
     # si estamos en la posicion del user o un flag estamos en un extremo del camino, por tanto no hay minimo 2
     if self.__representation[row][col] == Maze.FLAG or self.__representation[row][col] == Maze.USER:
       clauses.append(neighbours + [-target_literal]) # minimo un vecino
+      
+      # Restriccion menor o igual a 1
+      combinations = Maze.combinations_generator(neighbours, 2)
+
+      for c in combinations:
+        aux = []
+        for val in c:
+          aux.append(-val)
+        clauses.append(aux + [-target_literal])
     else:
       # Restriccion mayor o igual a 2: para ser un camino tiene que tener un lugar de donde viene y un lugar a donde va
       if len(neighbours) == 4:  # condiciones para casillas con 4 posibilidades
@@ -140,16 +149,15 @@ class Maze:
             aux.append(n if n in c else -n)
           clauses.append(aux + [-target_literal])
       
-      
-    # Restriccion menor o igual a 2
-    combinations = Maze.combinations_generator(neighbours, 3)
+      # Restriccion menor o igual a 2
+      combinations = Maze.combinations_generator(neighbours, 3)
 
-    for c in combinations:
-      aux = []
-      for val in c:
-        aux.append(-val)
-      clauses.append(aux + [-target_literal])
-    
+      for c in combinations:
+        aux = []
+        for val in c:
+          aux.append(-val)
+        clauses.append(aux + [-target_literal])
+
 
     return clauses
 

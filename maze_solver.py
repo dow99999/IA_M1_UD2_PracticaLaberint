@@ -70,12 +70,14 @@ cnf.extend(maze.get_all_maze_route_conditions())
 
 solver.append_formula(cnf)
 
-print("Solution:", solver.solve())
+print("Solution:", solver.solve(), end="\n\n")
 # print(solver.get_core())
 
 # print(maze.get_maze_literals_representation())
 
 print(maze.get_maze_representation())
+print("       |")
+print("       |")
 print("       V\n")
 
 model = solver.get_model()
