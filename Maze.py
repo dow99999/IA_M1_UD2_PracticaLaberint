@@ -121,17 +121,26 @@ class Maze:
     target_literal = self.get_literal_from_position(row, col)
     clauses = []
     
-    # clauses.append(neighbours + [-target_literal]) # minimo 1
-    
-    # Restriccion mayor o igual a 2
-    d_comb = Maze.combinations_generator(neighbours, 2)
-
-    for c in d_comb:
-      aux = []
-      for n in neighbours:
-        aux.append(n if n in c else -n)
-      clauses.append(aux + [-target_literal])
-
+    # si estamos en la posicion del user o un flag estamos en un extremo del camino, por tanto no hay minimo 2
+    if self.__representation[row][col] == Maze.FLAG or self.__representation[row][col] == Maze.USER:
+      clauses.append(neighbours + [-target_literal]) # minimo un vecino
+    else:
+      # Restriccion mayor o igual a 2: para ser un camino tiene que tener un lugar de donde viene y un lugar a donde va
+      if len(neighbours) == 4:  # condiciones para casillas con 4 posibilidades
+        for i in range(len(neighbours)):
+          aux = []
+          for n in neighbours:
+            aux.append(-n if neighbours[i] == n else n)
+          clauses.append(aux + [-target_literal])
+      else: # condiciones para casillas con menos de 4 posibilidades
+        d_comb = Maze.combinations_generator(neighbours, 2)
+        for c in d_comb:
+          aux = []
+          for n in neighbours:
+            aux.append(n if n in c else -n)
+          clauses.append(aux + [-target_literal])
+      
+      
     # Restriccion menor o igual a 2
     combinations = Maze.combinations_generator(neighbours, 3)
 

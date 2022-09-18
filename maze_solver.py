@@ -66,15 +66,27 @@ cnf.append(flags)
 # Desde una posicion cualquiera se puede generar un solo camino de salida arriba, abajo, a la izquierda o la derecha
 cnf.extend(maze.get_all_maze_route_conditions())
 
-print(cnf.clauses)
+# print(cnf.clauses)
 
 solver.append_formula(cnf)
 
-print(solver.solve())
+print("Solution:", solver.solve())
+# print(solver.get_core())
 
-print(maze.get_maze_literals_representation())
+# print(maze.get_maze_literals_representation())
+
 print(maze.get_maze_representation())
 print("       V\n")
-print(maze.get_maze_representation_with_path(solver.get_model()))
 
-# print(maze.get_route_conditions(1, 1))
+model = solver.get_model()
+if model is not None:
+  print(maze.get_maze_representation_with_path(model))
+else:
+  print("No Solution")
+
+
+# Testing key position's clauses
+# print(maze.get_route_conditions(8, 0), end="\n\n")
+# print(maze.get_route_conditions(8, 1), end="\n\n")
+# print(maze.get_route_conditions(8, 4), end="\n\n")
+# print(maze.get_route_conditions(7, 4), end="\n\n")
