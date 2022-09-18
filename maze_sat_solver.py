@@ -48,14 +48,13 @@ solver = Solver(name="g4")
 cnf = CNF()
 
 # Donde esta el usuario es por donde empezamos el camino
-# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente
-for user in maze.get_element_literals(M.USER):
-  cnf.append([user])
+# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente (con assumptions, por ejemplo)
+cnf.append([maze.get_element_literals(M.USER)[0]])
 
 
 # Un muro del laberinto no es un camino valido
 for wall in maze.get_element_literals(M.WALL):
-  cnf.append([-1*wall])
+  cnf.append([-wall])
 
 # Se quiere llegar al menos a un objetivo
 flags = []
@@ -71,21 +70,23 @@ cnf.extend(maze.get_all_maze_route_conditions())
 
 solver.append_formula(cnf)
 
-print("Solution:", solver.solve(), end="\n\n")
+solver.solve()
 # print(solver.get_core())
 
-# print(maze.get_maze_literals_representation())
+# print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
-print(maze.get_maze_representation())
-print("       |")
-print("       |")
-print("       V\n")
+print(" Maze Legend:")
+print("  Starting Point:", M.USER)
+print("           Walls:", M.WALL)
+print("      Objectives:", M.FLAG)
+print()
+print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
 
 model = solver.get_model()
 if model is not None:
-  print(maze.get_maze_representation_with_path(model))
+  print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
 else:
-  print("No Solution")
+  print("    No Solution")
 
 
 # Testing key position's clauses

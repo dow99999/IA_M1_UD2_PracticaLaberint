@@ -1,8 +1,8 @@
 class Maze:
   PATH = " "
-  WALL = "x"
-  USER = "u"
-  FLAG = "o"
+  WALL = "■"
+  USER = "¤"
+  FLAG = "ƒ"
 
   def combinations_generator(elements: list, length: int):
     combinations = []
@@ -29,6 +29,24 @@ class Maze:
     if matrix != None:
       self.load_maze_from_matrix(matrix)
 
+  def _box_maze(self, representation: str):
+    out = ""
+    lines = representation.split("\n")
+
+    out += "┌" + ("─" * (len(lines[0]) + 1)) + "┐\n"
+
+    for line in lines:
+      if line != "":
+        out += "│ "
+        for c in line:
+          out += c
+        out += "│\n"
+
+    out += "└" + ("─" * (len(lines[0]) + 1)) + "┘"
+
+    return out
+
+
   def load_maze_from_matrix(self, matrix: list):
     self.__representation = matrix.copy()
     self.__width = len(self.__representation[0])
@@ -43,7 +61,7 @@ class Maze:
   def get_maze_width(self):
     return self.__width
 
-  def get_maze_representation_with_path(self, model: list):
+  def get_maze_representation_with_path(self, model: list, pretty: bool = False):
     out = ""
     model_i = 1
 
@@ -53,9 +71,11 @@ class Maze:
         model_i += 1
       out += "\n"
 
-    return out
+    out = out[:-1]
+
+    return out if not pretty else self._box_maze(out)
   
-  def get_maze_representation(self):
+  def get_maze_representation(self, pretty: bool = False):
     out = ""
 
     for row in self.__representation:
@@ -63,19 +83,24 @@ class Maze:
         out += element + " "
       out += "\n"
 
-    return out
+    out = out[:-1]
 
-  def get_maze_literals_representation(self):
+    return out if not pretty else self._box_maze(out)
+
+  def get_maze_literals_representation(self, pretty: bool = False):
     out = ""
     current_literal = 1
 
     for row in self.__representation:
       for element in row:
+        if current_literal < 10: out += " "
         out += str(current_literal) + " "
         current_literal += 1
       out += "\n"
 
-    return out
+    out = out[:-1]
+
+    return out if not pretty else self._box_maze(out)
 
   def modify_element(self, row: int, col: int, new_element: str):
     self.__representation[row][col] = new_element
