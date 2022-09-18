@@ -48,6 +48,7 @@ solver = Solver(name="g4")
 cnf = CNF()
 
 # Donde esta el usuario es por donde empezamos el camino
+# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente
 for user in maze.get_element_literals(M.USER):
   cnf.append([user])
 
