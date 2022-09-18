@@ -32,6 +32,27 @@ class MazeSat(Maze):
 
     return out if not pretty else self._box_maze(out)
 
+  def get_maze_literals_on_path(self, pretty: bool = False):
+    """
+    Devuelve un string con la representacion del laberinto y los literales del camino
+    """
+    out = ""
+    current_literal = 1
+
+    for row in self._representation:
+      for element in row:
+        if element == Maze.PATH:
+          if current_literal < 10: out += " "
+          out += str(current_literal) + " "
+        else:
+          out += element + "  "
+        current_literal += 1
+      out += "\n"
+
+    out = out[:-1]
+
+    return out if not pretty else self._box_maze(out)
+
   def get_maze_representation_with_path(self, model: list, pretty: bool = False):
     """
     Devuelve un string con la misma representacion de laberinto que get_maze_representation pero con
@@ -198,8 +219,12 @@ class MazeSat(Maze):
     
     return flags
 
-  def get_user_clause(self):
+  def get_user_clauses(self, force_firection=None):
     """
-    Devuelve una clausula representando el usuario
+    Devuelve una clausula representando el usuario, opcionalmente se puede pasar un literal para
+    forzar una direccion hacia la que empezar el camino
     """
-    return [self.get_element_literals(Maze.USER)[0]]
+    out = [[self.get_element_literals(Maze.USER)[0]]]
+    if force_firection: out.append([force_firection])
+
+    return out

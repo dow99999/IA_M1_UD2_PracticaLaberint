@@ -29,6 +29,9 @@ from pysat.formula import CNF
 
 from MazeSat import MazeSat as M
 
+# Activar para seleccionar manualmente la direccion por donde empezara el camino
+INTERACTIVE_DIRECTION = False
+
 maze_matrix = [
   [ M.FLAG, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.FLAG ],
   [ M.PATH, M.PATH, M.PATH, M.PATH, M.WALL, M.PATH, M.PATH, M.PATH ],
@@ -51,8 +54,30 @@ cnf = CNF()
 # Preparamos las clausulas:
 
 # Donde esta el usuario es por donde empezamos el camino
-# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente (con assumptions, por ejemplo)
-cnf.append(maze.get_user_clause())
+# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente
+
+starting_paths = None
+
+print(" Maze Legend:")
+print("  Starting Point:", M.USER)
+print("           Walls:", M.WALL)
+print("      Objectives:", M.FLAG)
+print()
+
+
+if INTERACTIVE_DIRECTION:
+  print(" Maze's literals", maze.get_maze_literals_on_path(pretty=True), sep="\n")
+  starting_paths = maze.get_neighbour_literals(*maze.get_position_from_literal(maze.get_element_literals(M.USER)[0]))
+  start = None
+  while start not in starting_paths:
+    print("Possible Directions :", starting_paths)
+    try:
+      start = int(input("Select starting user direction: "))
+    except: pass
+
+
+
+cnf.extend(maze.get_user_clauses(start if starting_paths else None))
 
 # Un muro del laberinto no es un camino valido
 cnf.extend(maze.get_all_wall_clauses())
@@ -75,11 +100,6 @@ solver.solve()
 # Opcional para ver la representacion de las casillas con sus literales
 # print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
-print(" Maze Legend:")
-print("  Starting Point:", M.USER)
-print("           Walls:", M.WALL)
-print("      Objectives:", M.FLAG)
-print()
 print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
 
 model = solver.get_model()
