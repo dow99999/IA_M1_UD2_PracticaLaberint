@@ -155,7 +155,7 @@ class MazeSat(Maze):
       
       # probablemente se puede generalizar esta zona ↑
       ###
-      
+
       # Restriccion menor o igual a 2
       combinations = Maze.combinations_generator(neighbours, 3)
 
@@ -168,7 +168,7 @@ class MazeSat(Maze):
 
     return clauses
 
-  def get_all_maze_route_conditions(self):
+  def get_all_maze_route_clauses(self):
     """
     Devuelve una lista de clausulas que definen el camino posible entre todas las casillas
     """

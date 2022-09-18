@@ -61,7 +61,7 @@ cnf.extend(maze.get_all_wall_clauses())
 cnf.append(maze.get_all_flags_clause())
 
 # Desde una posicion cualquiera se puede generar una o dos posiciones libres dependiendo de si se esta en el inicio del camino o en medio
-cnf.extend(maze.get_all_maze_route_conditions())
+cnf.extend(maze.get_all_maze_route_clauses())
 
 # print(cnf.clauses)
 # print(len(cnf.clauses))
