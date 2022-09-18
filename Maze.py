@@ -1,16 +1,27 @@
 class Maze:
+  """
+  Clase para representar un laberinto
+  """
+
+  # Representaciones de cada tipo de casilla
   PATH = " "
   WALL = "■"
   USER = "¤"
   FLAG = "ƒ"
+  WAY = "·"
+  
 
   def combinations_generator(elements: list, length: int):
+    """
+    Devuelve una lista con todas las combinaciones sin repeticiones de length longitud posibles de todos los elementos de elements
+    """
     combinations = []
 
+    # Hacemos todas las combinaciones posibles de elementos
     def generate(comb):
       if len(comb) == length:
         if comb not in combinations:
-          combinations.append(comb)
+          combinations.append(comb) # Anadimos una combinacion solo si no ha sido anadida ya
         return
       
       for e in elements:
@@ -19,17 +30,29 @@ class Maze:
     
     generate(set())
 
-    return [ list(x) for x in combinations ]
+    return [ list(x) for x in combinations ]  # Convertimos los sets en listas
 
   def __init__(self, matrix: list = None):
-    self.__representation = []
-    self.__width = 0
-    self.__height = 0
+    self._representation = []
+    self._width = 0
+    self._height = 0
 
     if matrix != None:
       self.load_maze_from_matrix(matrix)
 
+  def load_maze_from_matrix(self, matrix: list):
+    """
+    Carga una matriz de tipos de casilla en el objeto Maze
+    """
+    self._representation = matrix.copy()
+    self._width = len(self._representation[0])
+    self._height = len(self._representation)
+
+
   def _box_maze(self, representation: str):
+    """
+    Funcion interna para representar lineas de un string de misma longitud dentro de un recuadro
+    """
     out = ""
     lines = representation.split("\n")
 
@@ -46,38 +69,32 @@ class Maze:
     return out
 
 
-  def load_maze_from_matrix(self, matrix: list):
-    self.__representation = matrix.copy()
-    self.__width = len(self.__representation[0])
-    self.__height = len(self.__representation)
-
   def get_maze_matrix(self):
-    return self.__representation.copy()
+    """
+    Devuelve la matriz de tipos de casilla del objeto
+    """
+    return self._representation.copy()
 
   def get_maze_height(self):
-    return self.__height
+    """
+    Devuelve la altura del laberinto
+    """
+    return self._height
     
   def get_maze_width(self):
-    return self.__width
-
-  def get_maze_representation_with_path(self, model: list, pretty: bool = False):
-    out = ""
-    model_i = 1
-
-    for row in self.__representation:
-      for element in row:
-        out += ("·" if model_i in model else element) + " "
-        model_i += 1
-      out += "\n"
-
-    out = out[:-1]
-
-    return out if not pretty else self._box_maze(out)
+    """
+    Devuelve el ancho del laberinto
+    """
+    return self._width
   
   def get_maze_representation(self, pretty: bool = False):
+    """
+    Devuelve un string con la representacion del laberinto con un simbolo por tipo de casilla
+    Ver las constantes estaticas de Maze para saber los tipos de casilla y su representacion
+    """
     out = ""
 
-    for row in self.__representation:
+    for row in self._representation:
       for element in row:
         out += element + " "
       out += "\n"
@@ -86,108 +103,10 @@ class Maze:
 
     return out if not pretty else self._box_maze(out)
 
-  def get_maze_literals_representation(self, pretty: bool = False):
-    out = ""
-    current_literal = 1
 
-    for row in self.__representation:
-      for element in row:
-        if current_literal < 10: out += " "
-        out += str(current_literal) + " "
-        current_literal += 1
-      out += "\n"
-
-    out = out[:-1]
-
-    return out if not pretty else self._box_maze(out)
 
   def modify_element(self, row: int, col: int, new_element: str):
-    self.__representation[row][col] = new_element
-  
-  def get_literal_from_position(self, row: int, col: int):
-    return col + (self.__width * row) + 1
-
-  def get_position_from_literal(self, literal: int):
-    literal -= 1
-    return (literal // self.__width, literal % self.__width)
-
-
-
-  def get_element_literals(self, target: str):
-    literals = []
-    current_literal = 1
-
-    for row in self.__representation:
-      for element in row:
-        if element == target:
-          literals.append(current_literal)
-        current_literal += 1
-
-    return literals
-
-
-  def get_neighbour_literals(self, row: int, col: int):
-    literals = []
-
-    if row > 0:
-      literals.append(self.get_literal_from_position(row - 1, col))
-    if col > 0:
-      literals.append(self.get_literal_from_position(row, col - 1))
-    if col < self.__width - 1:
-      literals.append(self.get_literal_from_position(row, col + 1))
-    if row < self.__height - 1:
-      literals.append(self.get_literal_from_position(row + 1, col))
-
-    return literals
-
-  def get_route_conditions(self, row: int, col: int):
-    neighbours = self.get_neighbour_literals(row, col)
-    target_literal = self.get_literal_from_position(row, col)
-    clauses = []
-    
-    # si estamos en la posicion del user o un flag estamos en un extremo del camino, por tanto no hay minimo 2
-    if self.__representation[row][col] == Maze.FLAG or self.__representation[row][col] == Maze.USER:
-      clauses.append(neighbours + [-target_literal]) # minimo un vecino
-      
-      # Restriccion menor o igual a 1
-      combinations = Maze.combinations_generator(neighbours, 2)
-
-      for c in combinations:
-        aux = []
-        for val in c:
-          aux.append(-val)
-        clauses.append(aux + [-target_literal])
-    else:
-      # Restriccion mayor o igual a 2: para ser un camino tiene que tener un lugar de donde viene y un lugar a donde va
-      if len(neighbours) == 4:  # condiciones para casillas con 4 posibilidades
-        for i in range(len(neighbours)):
-          aux = []
-          for n in neighbours:
-            aux.append(-n if neighbours[i] == n else n)
-          clauses.append(aux + [-target_literal])
-      else: # condiciones para casillas con menos de 4 posibilidades
-        d_comb = Maze.combinations_generator(neighbours, 2)
-        for c in d_comb:
-          aux = []
-          for n in neighbours:
-            aux.append(n if n in c else -n)
-          clauses.append(aux + [-target_literal])
-      
-      # Restriccion menor o igual a 2
-      combinations = Maze.combinations_generator(neighbours, 3)
-
-      for c in combinations:
-        aux = []
-        for val in c:
-          aux.append(-val)
-        clauses.append(aux + [-target_literal])
-
-
-    return clauses
-
-  def get_all_maze_route_conditions(self):
-    clauses = []
-    for row_i in range(self.__height):
-      for col_i in range(self.__width):
-        clauses += self.get_route_conditions(row_i, col_i)
-    return clauses
+    """
+    Modifica el tipo de una casilla
+    """
+    self._representation[row][col] = new_element

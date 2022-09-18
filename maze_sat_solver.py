@@ -27,7 +27,7 @@ x: wall
 from pysat.solvers import Solver
 from pysat.formula import CNF
 
-from Maze import Maze as M
+from MazeSat import MazeSat as M
 
 maze_matrix = [
   [ M.FLAG, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.FLAG ],
@@ -44,35 +44,35 @@ maze_matrix = [
 maze = M()
 maze.load_maze_from_matrix(maze_matrix)
 
-solver = Solver(name="g4")
+solver = Solver(name="g4")  # usamos Glucose4
 cnf = CNF()
+
+
+# Preparamos las clausulas:
 
 # Donde esta el usuario es por donde empezamos el camino
 # Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente (con assumptions, por ejemplo)
-cnf.append([maze.get_element_literals(M.USER)[0]])
-
+cnf.append(maze.get_user_clause())
 
 # Un muro del laberinto no es un camino valido
-for wall in maze.get_element_literals(M.WALL):
-  cnf.append([-wall])
+cnf.extend(maze.get_all_wall_clauses())
 
 # Se quiere llegar al menos a un objetivo
-flags = []
-for flag in maze.get_element_literals(M.FLAG):
-  flags.append(flag)
-cnf.append(flags)
+cnf.append(maze.get_all_flags_clause())
 
-
-# Desde una posicion cualquiera se puede generar un solo camino de salida arriba, abajo, a la izquierda o la derecha
+# Desde una posicion cualquiera se puede generar una o dos posiciones libres dependiendo de si se esta en el inicio del camino o en medio
 cnf.extend(maze.get_all_maze_route_conditions())
 
 # print(cnf.clauses)
+# print(len(cnf.clauses))
 
 solver.append_formula(cnf)
 
+# Resolvemos el laberinto:
 solver.solve()
 # print(solver.get_core())
 
+# Opcional para ver la representacion de las casillas con sus literales
 # print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
 print(" Maze Legend:")
