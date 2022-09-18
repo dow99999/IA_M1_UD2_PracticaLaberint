@@ -36,11 +36,10 @@ class Maze:
     out += "┌" + ("─" * (len(lines[0]) + 1)) + "┐\n"
 
     for line in lines:
-      if line != "":
-        out += "│ "
-        for c in line:
-          out += c
-        out += "│\n"
+      out += "│ "
+      for c in line:
+        out += c
+      out += "│\n"
 
     out += "└" + ("─" * (len(lines[0]) + 1)) + "┘"
 
