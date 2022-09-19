@@ -27,7 +27,7 @@ x: wall
 from pysat.solvers import Solver
 from pysat.formula import CNF
 
-from MazeSat import MazeSat as M
+from MazeSatVariant import MazeSat as M
 
 # Activar para seleccionar manualmente la direccion por donde empezara el camino
 INTERACTIVE_DIRECTION = False
