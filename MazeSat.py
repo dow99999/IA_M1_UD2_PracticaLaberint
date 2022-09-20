@@ -12,8 +12,9 @@ class MazeSat(Maze):
 
   def __init__(self, matrix: list = None):
     super().__init__(matrix)
-
-    self.__idpool = IDPool(occupied=[[1, self._height * self._width]])
+    
+    self.__layers = 3
+    self.__idpool = IDPool(occupied=[[1, self._height * self._width * self.__layers]])
 
 
   #######################################################################
@@ -86,18 +87,21 @@ class MazeSat(Maze):
   ## Transformations
   #######################################################################
 
-  def get_literal_from_position(self, row: int, col: int):
+  def get_literal_from_position(self, row: int, col: int, current_layer: int = 0):
     """
     Devuelve un literal dadas las coordenadas de una casilla
     """
-    return col + (self._width * row) + 1
+    return (col + (self._width * row) + 1) + (self._width * self._height * current_layer)
 
   def get_position_from_literal(self, literal: int):
     """
-    Devuelve las coordenadas de una casilla dado un literal
+    Devuelve las coordenadas y la capa de una casilla dado un literal
     """
     literal -= 1
-    return (literal // self._width, literal % self._width)
+    layer = literal // (self._width * self._height)
+    literal -= layer * (self._width * self._height)
+
+    return (literal // self._width, literal % self._width, layer)
 
   def get_element_literals(self, target: str):
     """
@@ -123,12 +127,13 @@ class MazeSat(Maze):
   ## Clause generators
   #######################################################################
 
-  def get_neighbour_literals(self, row: int, col: int):
+  def get_neighbour_literals(self, row: int, col: int, current_layer: int = 0):
     """
     Devuelve una lista de los literales conectados a una casilla, dicho de otro modo, los literales con los cuales 
     se puede formar un camino a traves de la casilla
     """
     literals = []
+    layer_mutator = (current_layer + 1) % self.__layers
 
     if row > 0:
       literals.append(self.get_literal_from_position(row - 1, col))
@@ -159,8 +164,6 @@ class MazeSat(Maze):
           encoding=card.EncType.pairwise
         ).clauses
       ])
-
-    # ir por estados y ejecutar el solver en cada estado? no se me ocurre otra forma
 
     return clauses
 
