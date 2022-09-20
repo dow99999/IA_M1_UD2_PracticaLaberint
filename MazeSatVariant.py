@@ -1,6 +1,6 @@
 from Maze import Maze
 
-class MazeSat(Maze):
+class MazeSatVariant(Maze):
   """
   Clase para representar un laberinto y generar las clausulas necesarias para resolverlo.
   en esta resolucion se utiliza el siguiente concepto:
@@ -212,22 +212,18 @@ class MazeSat(Maze):
 
     return clauses
 
-  def get_all_flags_clause(self):
+  def get_all_flags_clauses(self):
     """
     Devuelve una clausula con los objetivos dentro del laberinto
     """
-    flags = []
-    for flag in self.get_element_literals(Maze.FLAG):
-      flags.append(flag)
-    
-    return flags
+    return [self.get_element_literals(Maze.FLAG)]
 
-  def get_user_clauses(self, force_firection=None):
+  def get_user_clauses(self, force_direction=None):
     """
     Devuelve una clausula representando el usuario, opcionalmente se puede pasar un literal para
     forzar una direccion hacia la que empezar el camino
     """
     out = [[self.get_element_literals(Maze.USER)[0]]]
-    if force_firection: out.append([force_firection])
+    if force_direction: out.append([force_direction])
 
     return out

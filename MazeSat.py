@@ -1,13 +1,19 @@
 from Maze import Maze
 
+from pysat import card
+from pysat.formula import IDPool
+
+
 class MazeSat(Maze):
   """
-  Clase para representar un laberinto y generar las clausulas necesarias para resolverlo
+  Clase para representar un laberinto y generar las clausulas necesarias para resolverlo.
+  Esta resolucion utiliza las reglas explicadas en la practica
   """
 
   def __init__(self, matrix: list = None):
     super().__init__(matrix)
 
+    self.__idpool = IDPool(occupied=[[1, self._height * self._width]])
 
 
   #######################################################################
@@ -142,50 +148,19 @@ class MazeSat(Maze):
     neighbours = self.get_neighbour_literals(row, col)
     target_literal = self.get_literal_from_position(row, col)
     clauses = []
-    
-    # si estamos en la posicion del user o un flag estamos en un extremo del camino, por tanto no hay minimo 2
-    if self._representation[row][col] == Maze.FLAG or self._representation[row][col] == Maze.USER:
-      clauses.append(neighbours + [-target_literal]) # minimo un vecino
-      
-      # Restriccion menor o igual a 1
-      combinations = Maze.combinations_generator(neighbours, 2)
 
-      for c in combinations:
-        aux = []
-        for val in c:
-          aux.append(-val)
-        clauses.append(aux + [-target_literal])
-    else:
-      ###
-      # Probablemente se puede generalizar esta zona ↓
-      
-      # Restriccion mayor o igual a 2: para ser un camino tiene que tener un lugar de donde viene y un lugar a donde va
-      if len(neighbours) == 4:  # condiciones para casillas con 4 posibilidades
-        for i in range(len(neighbours)):
-          aux = []
-          for n in neighbours:
-            aux.append(-n if neighbours[i] == n else n)
-          clauses.append(aux + [-target_literal])
-      else: # condiciones para casillas con menos de 4 posibilidades
-        d_comb = Maze.combinations_generator(neighbours, 2)
-        for c in d_comb:
-          aux = []
-          for n in neighbours:
-            aux.append(n if n in c else -n)
-          clauses.append(aux + [-target_literal])
-      
-      # probablemente se puede generalizar esta zona ↑
-      ###
+    if self._representation[row][col] != Maze.FLAG:
+      clauses.extend([
+        clause + [ -target_literal ] for clause in 
+        card.CardEnc.equals(
+          lits= neighbours,
+          bound=1,
+          vpool=self.__idpool,
+          encoding=card.EncType.pairwise
+        ).clauses
+      ])
 
-      # Restriccion menor o igual a 2
-      combinations = Maze.combinations_generator(neighbours, 3)
-
-      for c in combinations:
-        aux = []
-        for val in c:
-          aux.append(-val)
-        clauses.append(aux + [-target_literal])
-
+    # ir por estados y ejecutar el solver en cada estado? no se me ocurre otra forma
 
     return clauses
 
@@ -203,28 +178,26 @@ class MazeSat(Maze):
     """
     Devuelve una lista de clausulas que definen las casillas con muros
     """
-    clauses = []
-    for wall in self.get_element_literals(Maze.WALL):
-      clauses.append([-wall])
+    return [[-wall] for wall in self.get_element_literals(Maze.WALL)]
 
-    return clauses
-
-  def get_all_flags_clause(self):
+  def get_all_flags_clauses(self):
     """
     Devuelve una clausula con los objetivos dentro del laberinto
     """
-    flags = []
-    for flag in self.get_element_literals(Maze.FLAG):
-      flags.append(flag)
     
-    return flags
+    return card.CardEnc.equals(
+      lits=self.get_element_literals(Maze.FLAG),
+      bound=1,
+      vpool=self.__idpool,
+      encoding=card.EncType.pairwise
+    ).clauses
 
-  def get_user_clauses(self, force_firection=None):
+  def get_user_clauses(self, force_direction=None):
     """
     Devuelve una clausula representando el usuario, opcionalmente se puede pasar un literal para
     forzar una direccion hacia la que empezar el camino
     """
     out = [[self.get_element_literals(Maze.USER)[0]]]
-    if force_firection: out.append([force_firection])
+    if force_direction: out.append([force_direction])
 
     return out

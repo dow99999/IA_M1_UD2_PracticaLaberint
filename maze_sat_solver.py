@@ -27,7 +27,8 @@ x: wall
 from pysat.solvers import Solver
 from pysat.formula import CNF
 
-from MazeSatVariant import MazeSat as M
+# from MazeSatVariant import MazeSatVariant as M
+from MazeSat import MazeSat as M
 
 # Activar para seleccionar manualmente la direccion por donde empezara el camino
 INTERACTIVE_DIRECTION = False
@@ -83,7 +84,7 @@ cnf.extend(maze.get_user_clauses(start if starting_paths else None))
 cnf.extend(maze.get_all_wall_clauses())
 
 # Se quiere llegar al menos a un objetivo
-cnf.append(maze.get_all_flags_clause())
+cnf.extend(maze.get_all_flags_clauses())
 
 # Desde una posicion cualquiera se puede generar una o dos posiciones libres dependiendo de si se esta en el inicio del camino o en medio
 cnf.extend(maze.get_all_maze_route_clauses())
@@ -98,7 +99,7 @@ solver.solve()
 # print(solver.get_core())
 
 # Opcional para ver la representacion de las casillas con sus literales
-# print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
+print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
 print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
 
