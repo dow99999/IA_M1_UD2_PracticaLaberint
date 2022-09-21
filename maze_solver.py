@@ -25,9 +25,11 @@ x: wall
 """
 
 import sys
+from unicodedata import name
 
 from pysat.solvers import Solver
-from pysat.formula import CNF
+from pysat.examples import rc2
+from pysat.formula import CNF, WCNF
 
 SAT_DOUBLE_TILE = "1"
 SAT_DOUBLE_TILE_PYSAT_CARDINALITY = "2"
@@ -52,6 +54,8 @@ if sys.argv[1] == "1" or sys.argv[1] == "2":
 elif sys.argv[1] == "3":
   from MazeSatLayeredTiles import MazeSatLayeredTiles as M
 
+USING_MAXSAT = sys.argv[1] not in [SAT_DOUBLE_TILE, SAT_DOUBLE_TILE_PYSAT_CARDINALITY, SAT_LAYERED_TILES]
+
 # Activar para seleccionar manualmente la direccion por donde empezara el camino
 INTERACTIVE_DIRECTION = False
 
@@ -74,8 +78,8 @@ else:
   
 maze.load_maze_from_matrix(maze_matrix)
 
-solver = Solver(name="g4")  # usamos Glucose4
-cnf = CNF()
+solver = rc2(name="g4") if USING_MAXSAT else Solver(name="g4")  # usamos Glucose4
+multipurpose_cnf = WCNF() if USING_MAXSAT else CNF()
 
 
 # Preparamos las clausulas:
@@ -104,21 +108,22 @@ if INTERACTIVE_DIRECTION:
 
 
 
-cnf.extend(maze.get_user_clauses(start if starting_paths else None))
+multipurpose_cnf.extend(maze.get_user_clauses(start if starting_paths else None))
 
 # Un muro del laberinto no es un camino valido
-cnf.extend(maze.get_all_wall_clauses())
+multipurpose_cnf.extend(maze.get_all_wall_clauses())
 
 # Se quiere llegar al menos a un objetivo
-cnf.extend(maze.get_all_flags_clauses())
+multipurpose_cnf.extend(maze.get_all_flags_clauses())
 
 # Desde una posicion cualquiera se puede generar una o dos posiciones libres dependiendo de si se esta en el inicio del camino o en medio
-cnf.extend(maze.get_all_maze_route_clauses())
+route_clauses = maze.get_all_maze_route_clauses()
+multipurpose_cnf.extend(route_clauses)
 
 # print(cnf.clauses)
-print("Number of Clauses:", len(cnf.clauses))
+print("Number of Clauses:", len(multipurpose_cnf.clauses))
 
-solver.append_formula(cnf)
+solver.append_formula(multipurpose_cnf)
 
 # Resolvemos el laberinto:
 solver.solve()
@@ -133,9 +138,9 @@ model = solver.get_model()
 # print([x for x in model if x > 0])
 
 if model is not None:
-  print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
   if sys.argv[1] == SAT_LAYERED_TILES:
     print("Maze's paths per layer:", maze.get_maze_layer_representation_with_path(model, pretty=True), sep="\n")
+  print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
 else:
   print("    No Solution")
 
