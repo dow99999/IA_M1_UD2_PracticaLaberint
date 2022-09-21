@@ -1,4 +1,3 @@
-from xmlrpc.client import Boolean
 from Maze import Maze
 
 from pysat import card
