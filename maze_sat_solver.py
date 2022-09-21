@@ -134,6 +134,8 @@ model = solver.get_model()
 
 if model is not None:
   print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
+  if sys.argv[1] == SAT_LAYERED_TILES:
+    print("Maze's paths per layer:", maze.get_maze_layer_representation_with_path(model, pretty=True), sep="\n")
 else:
   print("    No Solution")
 

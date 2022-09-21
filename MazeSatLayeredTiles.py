@@ -92,6 +92,29 @@ class MazeSatLayeredTiles(Maze):
 
     return out if not pretty else self._box_maze(out)
 
+  def get_maze_layer_representation_with_path(self, model: list, pretty: bool = False):
+    """
+    Devuelve un string con la representacion de cada capa del laberinto y el camino 
+    definido por model marcado por puntos
+    """
+    out = ""
+
+    for l in range(self.__layers):
+      out += "Layer " + str(l) + (" " * (2*len(self._representation[0]) - 3))
+    out += "\n"
+
+    for row_i in range(len(self._representation)):
+      for layer in range(self.__layers):
+        for col_i in range(len(self._representation[row_i])):
+          element = self._representation[row_i][col_i]
+          out += (Maze.WAY if self.get_literal_from_position(row_i, col_i, layer) in model else element) + " "
+        out += "    "
+      out += "\n"
+
+    out = out[:-1]
+
+    return out if not pretty else self._box_maze(out)
+
 
 
 
