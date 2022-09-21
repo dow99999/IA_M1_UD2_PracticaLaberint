@@ -24,11 +24,33 @@ x: wall
  : path
 """
 
+import sys
+
 from pysat.solvers import Solver
 from pysat.formula import CNF
 
-# from MazeSatVariant import MazeSatVariant as M
-from MazeSat import MazeSat as M
+SAT_DOUBLE_TILE = "1"
+SAT_DOUBLE_TILE_PYSAT_CARDINALITY = "2"
+SAT_LAYERED_TILES = "3"
+
+OPTIONS = [
+  SAT_DOUBLE_TILE,
+  SAT_DOUBLE_TILE_PYSAT_CARDINALITY,
+  SAT_LAYERED_TILES
+  ]
+
+if len(sys.argv) != 2 or sys.argv[1] not in OPTIONS:
+  print("Needs one argument from this list ", [ int(o) for o in OPTIONS ],": ", sep="")
+  print(" 1. SAT Double Tiles Path With Manual Cardinality Restrictions")
+  print(" 2. SAT Double Tiles Path With PySat Cardinality Restrictions")
+  print(" 3. SAT Layered One Direction Path")
+  exit()
+
+
+if sys.argv[1] == "1" or sys.argv[1] == "2":
+  from MazeSatDoubleTiles import MazeSatDoubleTiles as M
+elif sys.argv[1] == "3":
+  from MazeSatLayeredTiles import MazeSatLayeredTiles as M
 
 # Activar para seleccionar manualmente la direccion por donde empezara el camino
 INTERACTIVE_DIRECTION = False
@@ -45,7 +67,11 @@ maze_matrix = [
   [ M.USER, M.PATH, M.PATH, M.PATH, M.PATH, M.WALL, M.PATH, M.PATH ]
 ]
 
-maze = M()
+if sys.argv[1] == "1" or sys.argv[1] == "2":
+  maze = M(pysat_cardinality=(sys.argv[1] == "2"))
+else:
+  maze = M()
+  
 maze.load_maze_from_matrix(maze_matrix)
 
 solver = Solver(name="g4")  # usamos Glucose4
@@ -90,7 +116,7 @@ cnf.extend(maze.get_all_flags_clauses())
 cnf.extend(maze.get_all_maze_route_clauses())
 
 # print(cnf.clauses)
-# print(len(cnf.clauses))
+print("Number of Clauses:", len(cnf.clauses))
 
 solver.append_formula(cnf)
 
@@ -99,11 +125,13 @@ solver.solve()
 # print(solver.get_core())
 
 # Opcional para ver la representacion de las casillas con sus literales
-print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
+# print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
 print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
 
 model = solver.get_model()
+# print([x for x in model if x > 0])
+
 if model is not None:
   print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
 else:
