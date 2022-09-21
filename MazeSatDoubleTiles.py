@@ -107,21 +107,6 @@ class MazeSatDoubleTiles(Maze):
     literal -= 1
     return (literal // self._width, literal % self._width)
 
-  def get_element_literals(self, target: str):
-    """
-    Devuelve una lista de todos los literales de un tipo
-    """
-    literals = []
-    current_literal = 1
-
-    for row in self._representation:
-      for element in row:
-        if element == target:
-          literals.append(current_literal)
-        current_literal += 1
-
-    return literals
-
 
 
 

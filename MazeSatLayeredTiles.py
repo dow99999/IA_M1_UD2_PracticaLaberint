@@ -22,6 +22,7 @@ class MazeSatLayeredTiles(Maze):
     self.__layer_length = self._width * self._height
     self.__idpool = IDPool(occupied=[[1, self._height * self._width * self.__layers]])
 
+  def get_layers(self): return self.__layers
 
   #######################################################################
   ## Maze Representations
@@ -32,13 +33,17 @@ class MazeSatLayeredTiles(Maze):
     Devuelve un string con la representacion del laberinto en literales
     """
     out = ""
-    current_literal = 1
 
-    for row in self._representation:
-      for element in row:
-        if current_literal < 10: out += " "
-        out += str(current_literal) + " "
-        current_literal += 1
+    for l in range(self.__layers):
+      out += "Layer " + str(l) + (" " * (2*len(self._representation[0]) + 13))
+    out += "\n"
+
+    for row_i in range(len(self._representation)):
+      for layer in range(self.__layers):
+        for col_i in range(len(self._representation[row_i])):
+          literal = self.get_literal_from_position(row_i, col_i, layer)
+          out += str(literal) + (" " if literal < 10 else "") + (" " if literal < 100 else "") + " "
+        out += "    "
       out += "\n"
 
     out = out[:-1]
@@ -139,21 +144,6 @@ class MazeSatLayeredTiles(Maze):
     literal -= layer * (self._width * self._height)
 
     return (literal // self._width, literal % self._width, layer)
-
-  def get_element_literals(self, target: str):
-    """
-    Devuelve una lista de todos los literales de un tipo
-    """
-    literals = []
-    current_literal = 1
-
-    for row in self._representation:
-      for element in row:
-        if element == target:
-          literals.append(current_literal)
-        current_literal += 1
-
-    return literals
 
 
 

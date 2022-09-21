@@ -25,76 +25,58 @@ x: wall
 """
 
 import sys
-from unicodedata import name
 
 from pysat.solvers import Solver
-from pysat.examples import rc2
+from pysat.examples.rc2 import RC2
 from pysat.formula import CNF, WCNF
 
-SAT_DOUBLE_TILE = "1"
-SAT_DOUBLE_TILE_PYSAT_CARDINALITY = "2"
-SAT_LAYERED_TILES = "3"
-
-OPTIONS = [
-  SAT_DOUBLE_TILE,
-  SAT_DOUBLE_TILE_PYSAT_CARDINALITY,
-  SAT_LAYERED_TILES
-  ]
+# Para gestionar diferentes parametros del programa
+from constants import *
 
 if len(sys.argv) != 2 or sys.argv[1] not in OPTIONS:
   print("Needs one argument from this list ", [ int(o) for o in OPTIONS ],": ", sep="")
-  print(" 1. SAT Double Tiles Path With Manual Cardinality Restrictions")
-  print(" 2. SAT Double Tiles Path With PySat Cardinality Restrictions")
-  print(" 3. SAT Layered One Direction Path")
+  print(" 1. (Working~) SAT Double Tiles Path With Manual Cardinality Restrictions")
+  print(" 2. (Working) SAT Double Tiles Path With PySat Cardinality Restrictions")
+  print(" 3. (Working) SAT Layered One Direction Path\n")
+  print(" 4. (Working) MaxSAT Double Tiles Path With Manual Cardinality Restrictions")
+  print(" 5. (Working) MaxSAT Double Tiles Path With PySat Cardinality Restrictions")
+  print(" 6. (Working) MaxSAT Layered One Direction Path")
   exit()
 
-
-if sys.argv[1] == "1" or sys.argv[1] == "2":
+# Cargamos segun el tipo de resolucion que usaremos (DOUBLE_TILE o LAYERED)
+if sys.argv[1] in [SAT_DOUBLE_TILE, SAT_DOUBLE_TILE_PYSAT_CARDINALITY, MAXSAT_DOUBLE_TILE, MAXSAT_DOUBLE_TILE_PYSAT_CARDINALITY]:
   from MazeSatDoubleTiles import MazeSatDoubleTiles as M
-elif sys.argv[1] == "3":
+elif sys.argv[1] in [SAT_LAYERED_TILES, MAXSAT_LAYERED_TILES]:
   from MazeSatLayeredTiles import MazeSatLayeredTiles as M
 
-USING_MAXSAT = sys.argv[1] not in [SAT_DOUBLE_TILE, SAT_DOUBLE_TILE_PYSAT_CARDINALITY, SAT_LAYERED_TILES]
+# Comprovacion de si el experimento es de tipo MaxSAT o SAT
+USING_MAXSAT = sys.argv[1] in [MAXSAT_DOUBLE_TILE, MAXSAT_DOUBLE_TILE_PYSAT_CARDINALITY, MAXSAT_LAYERED_TILES]
 
 # Activar para seleccionar manualmente la direccion por donde empezara el camino
 INTERACTIVE_DIRECTION = False
 
-maze_matrix = [
-  [ M.FLAG, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.FLAG ],
-  [ M.PATH, M.PATH, M.PATH, M.PATH, M.WALL, M.PATH, M.PATH, M.PATH ],
-  [ M.PATH, M.WALL, M.WALL, M.PATH, M.WALL, M.PATH, M.WALL, M.PATH ],
-  [ M.PATH, M.PATH, M.WALL, M.PATH, M.WALL, M.PATH, M.WALL, M.PATH ],
-  [ M.WALL, M.PATH, M.WALL, M.PATH, M.PATH, M.PATH, M.PATH, M.PATH ],
-  [ M.WALL, M.PATH, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL, M.WALL ],
-  [ M.PATH, M.PATH, M.PATH, M.PATH, M.PATH, M.PATH, M.PATH, M.PATH ],
-  [ M.WALL, M.WALL, M.WALL, M.WALL, M.PATH, M.WALL, M.WALL, M.WALL ],
-  [ M.USER, M.PATH, M.PATH, M.PATH, M.PATH, M.WALL, M.PATH, M.PATH ]
-]
-
-if sys.argv[1] == "1" or sys.argv[1] == "2":
-  maze = M(pysat_cardinality=(sys.argv[1] == "2"))
+# en caso de usar DOUBLE_TILE gestionamos que tipo de restriccion de cardinalidad usaremos (manual o de pysat)
+if sys.argv[1] in [SAT_DOUBLE_TILE, SAT_DOUBLE_TILE_PYSAT_CARDINALITY, MAXSAT_DOUBLE_TILE, MAXSAT_DOUBLE_TILE_PYSAT_CARDINALITY]:
+  maze = M(pysat_cardinality=(sys.argv[1] in [SAT_DOUBLE_TILE_PYSAT_CARDINALITY, MAXSAT_DOUBLE_TILE_PYSAT_CARDINALITY]))
 else:
   maze = M()
-  
-maze.load_maze_from_matrix(maze_matrix)
 
-solver = rc2(name="g4") if USING_MAXSAT else Solver(name="g4")  # usamos Glucose4
+# Cargamos los datos de casilla del laberinto
+maze.load_maze_from_matrix(MAZE_MATRIX)
+
 multipurpose_cnf = WCNF() if USING_MAXSAT else CNF()
 
-
-# Preparamos las clausulas:
-
-# Donde esta el usuario es por donde empezamos el camino
-# Importante: En caso que el usuario tenga mas de una opcion para empezar el camino hay que forzar una direccion manualmente
-
-starting_paths = None
-
+# leyenda de los caracteres usados para representar el laberinto
 print(" Maze Legend:")
 print("  Starting Point:", M.USER)
 print("           Walls:", M.WALL)
 print("      Objectives:", M.FLAG)
 print()
 
+
+###################################
+# Usado solo en el primer experimento (SAT_DOUBLE_TILE) y en caso que el usuario tenga mas de una opcion en el primer estado del laberinto
+starting_paths = None
 
 if INTERACTIVE_DIRECTION:
   print(" Maze's literals", maze.get_maze_literals_on_path(pretty=True), sep="\n")
@@ -105,45 +87,86 @@ if INTERACTIVE_DIRECTION:
     try:
       start = int(input("Select starting user direction: "))
     except: pass
+###################################
+
+
+# Opcional para ver la representacion de las casillas con sus literales
+if SHOW_LITERAL_REPRESENTATION:
+  print(" Maze's literals:", maze.get_maze_literals_representation(pretty=True), sep="\n")
+
+# Mostramos el laberinto sin resolver
+print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
 
 
 
+
+
+# Preparamos las clausulas:
+
+# Anadimos casillas forzadas en caso de querer generar un ciclo
+if FORCE_LOOP or FORCE_LAYERED_LOOP:
+  if USING_MAXSAT:
+    multipurpose_cnf.extend(LOOP_CLAUSES, weights=[LOOP_TILE_WEIGHT] * len(LOOP_CLAUSES))
+  else:
+    multipurpose_cnf.extend(LOOP_CLAUSES)
+
+# La posicion del usuario
 multipurpose_cnf.extend(maze.get_user_clauses(start if starting_paths else None))
 
 # Un muro del laberinto no es un camino valido
 multipurpose_cnf.extend(maze.get_all_wall_clauses())
 
-# Se quiere llegar al menos a un objetivo
+# Se quiere llegar a, como maximo, un objetivo
 multipurpose_cnf.extend(maze.get_all_flags_clauses())
 
-# Desde una posicion cualquiera se puede generar una o dos posiciones libres dependiendo de si se esta en el inicio del camino o en medio
-route_clauses = maze.get_all_maze_route_clauses()
-multipurpose_cnf.extend(route_clauses)
+# Generamos las condiciones de cada casilla
+multipurpose_cnf.extend(maze.get_all_maze_route_clauses())
 
-# print(cnf.clauses)
-print("Number of Clauses:", len(multipurpose_cnf.clauses))
+# Asignamos un peso fijo a toda casilla en caso de usar MaxSAT
+if USING_MAXSAT:
+  maze_l = (maze.get_maze_width() * maze.get_maze_height())
+  if sys.argv[1] in [SAT_LAYERED_TILES, MAXSAT_LAYERED_TILES]:  # Las resoluciones LAYERED tienen mas casillas
+    multipurpose_cnf.extend([[-x] for x in range(1, (maze_l * maze.get_layers()) + 1)], weights=[GENERAL_TILE_WEIGHT] * (maze_l * maze.get_layers()))
+  else:
+    multipurpose_cnf.extend([[-x] for x in range(1, maze_l + 1)], weights=[GENERAL_TILE_WEIGHT] * maze_l)
 
-solver.append_formula(multipurpose_cnf)
 
-# Resolvemos el laberinto:
-solver.solve()
-# print(solver.get_core())
 
-# Opcional para ver la representacion de las casillas con sus literales
-# print(" Maze's literals", maze.get_maze_literals_representation(pretty=True), sep="\n")
+# Inicializamos el solver con las restricciones ya generadas
+solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
 
-print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
+# Resolvemos el laberinto (solo para SAT):
+if not USING_MAXSAT:
+  solver.solve()
 
-model = solver.get_model()
-# print([x for x in model if x > 0])
+# conseguimos el modelo para su posterior gestion
+if USING_MAXSAT:
+  model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
+else:
+  model = solver.get_model()
+
 
 if model is not None:
-  if sys.argv[1] == SAT_LAYERED_TILES:
+  # En caso de alguna resolucion LAYERED mostramos el camino en cada capa
+  if sys.argv[1] in [ SAT_LAYERED_TILES, MAXSAT_LAYERED_TILES ]:
     print("Maze's paths per layer:", maze.get_maze_layer_representation_with_path(model, pretty=True), sep="\n")
+  
   print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
+  
+  # En caso de MaxSAT mostramos ademas el coste del camino
+  if USING_MAXSAT and SHOW_MODEL_COST:
+    print("Model cost:", solver.cost)
+
+  if SHOW_PATH_LENGTH:
+    # Contamos de todos los literales de casilla cuantos estan en positivo
+    max_literal = (len(MAZE_MATRIX) * len(MAZE_MATRIX[0]) * (maze.get_layers() if callable(getattr(maze, "get_layers", None)) else 1))
+    print("Path length:", len([x for x in model if x > 0 and x <= max_literal]))
 else:
   print("    No Solution")
 
+# Mostramos el numero de clausulas usadas en la resolucion
+if SHOW_CLAUSE_NUMBER:
+  print("Number of clauses:", len(multipurpose_cnf.clauses) if type(multipurpose_cnf) is CNF else (len(multipurpose_cnf.hard) + len(multipurpose_cnf.soft)))
 
 # Testing key position's clauses
 # print(maze.get_route_conditions(8, 0), end="\n\n")
