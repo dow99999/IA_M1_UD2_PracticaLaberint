@@ -33,11 +33,11 @@ from pysat.formula import CNF, WCNF
 # Para gestionar diferentes parametros del programa
 from constants import *
 
-if len(sys.argv) != 2 or sys.argv[1] not in OPTIONS:
+if len(sys.argv) not in [2, 3] or sys.argv[1] not in OPTIONS:
   print("Needs one argument from this list ", [ int(o) for o in OPTIONS ],": ", sep="")
   print(" 1. (Working~) SAT Double Tiles Path With Manual Cardinality Restrictions")
   print(" 2. (Working) SAT Double Tiles Path With PySat Cardinality Restrictions")
-  print(" 3. (Working) SAT Layered One Direction Path\n")
+  print(" 3. (Working~) SAT Layered One Direction Path\n")
   print(" 4. (Working) MaxSAT Double Tiles Path With Manual Cardinality Restrictions")
   print(" 5. (Working) MaxSAT Double Tiles Path With PySat Cardinality Restrictions")
   print(" 6. (Working) MaxSAT Layered One Direction Path")
@@ -62,7 +62,10 @@ else:
   maze = M()
 
 # Cargamos los datos de casilla del laberinto
-maze.load_maze_from_matrix(MAZE_MATRIX)
+if len(sys.argv) == 3:
+  maze.load_maze_from_file(sys.argv[2])
+else:
+  maze.load_maze_from_matrix(MAZE_MATRIX)
 
 multipurpose_cnf = WCNF() if USING_MAXSAT else CNF()
 
@@ -159,7 +162,7 @@ if model is not None:
 
   if SHOW_PATH_LENGTH:
     # Contamos de todos los literales de casilla cuantos estan en positivo
-    max_literal = (len(MAZE_MATRIX) * len(MAZE_MATRIX[0]) * (maze.get_layers() if callable(getattr(maze, "get_layers", None)) else 1))
+    max_literal = (maze.get_maze_width() * maze.get_maze_height() * (maze.get_layers() if callable(getattr(maze, "get_layers", None)) else 1))
     print("Path length:", len([x for x in model if x > 0 and x <= max_literal]))
 else:
   print("    No Solution")

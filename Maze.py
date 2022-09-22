@@ -48,6 +48,35 @@ class Maze:
     self._width = len(self._representation[0])
     self._height = len(self._representation)
 
+  def load_maze_from_file(self, path: str):
+    """
+    Carga los datos de las casillas del laberinto a traves de un archivo de texto plano
+    """
+    raw_data = open(path, "r").readlines()
+    maze_matrix = []
+
+    types = [ t for t in raw_data[0] ][:-1]
+    assert len(types) == 4 and len([c for c in types if len(c) > 1]) == 0, "Bad format on tile type specifications, there has to be 4 types (user, objectives, path, walls) and each one must be only one character"
+
+    user, flag, path, wall = types
+
+    translator = {
+      (user): self.USER,
+      (flag): self.FLAG,
+      (wall): self.WALL,
+      (path): self.PATH
+    }
+
+    for line_i in range(1, len(raw_data)):
+      maze_matrix.append([])
+      for tile_type in raw_data[line_i]:
+        if tile_type != "\n":
+          maze_matrix[line_i - 1].append(translator[tile_type])
+
+    self.load_maze_from_matrix(maze_matrix)
+        
+
+
 
   def _box_maze(self, representation: str):
     """
