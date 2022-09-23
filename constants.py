@@ -16,12 +16,12 @@ SHOW_PATH_LENGTH = True
 SHOW_MODEL_COST = True
 
 # Fuerza un loop en el modelo
-FORCE_LOOP = False          # Usando una casilla, para las resoluciones LAYERED
+FORCE_LOOP = True          # Usando una casilla, para las resoluciones LAYERED
 FORCE_LAYERED_LOOP = False  # Usando dos casillas, para las resoluciones DOUBLE_TILE
-LOOP_TILE_WEIGHT = 1        # Recomendado usar una weight menor a la de generar una casilla
+LOOP_TILE_WEIGHT = 1        # Peso de una casilla de generacion de ciclos, usado para las soluciones MaxSAT
 
 # Peso general de crear una casilla, usado para las soluciones MaxSAT
-GENERAL_TILE_WEIGHT = 2
+GENERAL_TILE_WEIGHT = 1
 
 # Representacion del laberinto en una matriz por tipos
 MAZE_MATRIX = [
