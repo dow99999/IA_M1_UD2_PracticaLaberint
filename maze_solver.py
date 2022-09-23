@@ -25,6 +25,7 @@ x: wall
 """
 
 import sys
+import time
 
 from pysat.solvers import Solver
 from pysat.examples.rc2 import RC2
@@ -98,7 +99,7 @@ if SHOW_LITERAL_REPRESENTATION:
   print(" Maze's literals:", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
 # Mostramos el laberinto sin resolver
-print(" Maze:", maze.get_maze_representation(pretty=True), sep="\n")
+print(f" Maze [{maze.get_maze_width()}x{maze.get_maze_height()}]:", maze.get_maze_representation(pretty=True), sep="\n")
 
 
 
@@ -134,27 +135,31 @@ if USING_MAXSAT:
     multipurpose_cnf.extend([[-x] for x in range(1, maze_l + 1)], weights=[GENERAL_TILE_WEIGHT] * maze_l)
 
 
-
 # Inicializamos el solver con las restricciones ya generadas
 solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
 
-# Resolvemos el laberinto (solo para SAT):
+
+
+i_time = time.time_ns()
+
+# Resolvemos el laberinto y obtenemos el modelo, diferenciando entre una resolucion SAT y una MaxSAT:
 if not USING_MAXSAT:
   solver.solve()
-
-# conseguimos el modelo para su posterior gestion
-if USING_MAXSAT:
-  model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
-else:
   model = solver.get_model()
+else:
+  model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
+
+f_time = time.time_ns() - i_time
+
 
 
 if model is not None:
   # En caso de alguna resolucion LAYERED mostramos el camino en cada capa
-  if sys.argv[1] in [ SAT_LAYERED_TILES, MAXSAT_LAYERED_TILES ]:
+  if SHOW_MAZE_LAYERED_SOLUTION and sys.argv[1] in [ SAT_LAYERED_TILES, MAXSAT_LAYERED_TILES ]:
     print("Maze's paths per layer:", maze.get_maze_layer_representation_with_path(model, pretty=True), sep="\n")
   
-  print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
+  if SHOW_MAZE_SOLUTION:
+    print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
   
   # En caso de MaxSAT mostramos ademas el coste del camino
   if USING_MAXSAT and SHOW_MODEL_COST:
@@ -170,6 +175,9 @@ else:
 # Mostramos el numero de clausulas usadas en la resolucion
 if SHOW_CLAUSE_NUMBER:
   print("Number of clauses:", len(multipurpose_cnf.clauses) if type(multipurpose_cnf) is CNF else (len(multipurpose_cnf.hard) + len(multipurpose_cnf.soft)))
+
+if SHOW_SOLVING_TIME:
+  print("Solving time:", f_time / 1000000, "ms")
 
 # Testing key position's clauses
 # print(maze.get_route_conditions(8, 0), end="\n\n")
