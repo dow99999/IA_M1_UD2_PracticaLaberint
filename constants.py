@@ -4,6 +4,9 @@ from Maze import Maze as M
 SOLVER_NAME = "g4" 
 
 
+# Guarda el output del programa en un archivo de texto (output.txt)
+SEND_OUTPUT_TO_FILE = False
+
 
 # Mostrar el laberinto sin resolver
 SHOW_MAZE_REPRESENTATION = True

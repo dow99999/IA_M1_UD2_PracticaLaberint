@@ -34,6 +34,11 @@ from pysat.formula import CNF, WCNF
 # Para gestionar diferentes parametros del programa
 from constants import *
 
+
+if SEND_OUTPUT_TO_FILE:
+  f = open('output.txt','w', encoding="utf-8")
+  sys.stdout = f
+
 if len(sys.argv) not in [2, 3] or sys.argv[1] not in OPTIONS:
   print("Needs one argument from this list ", [ int(o) for o in OPTIONS ],": ", sep="")
   print(" 1. (Working~) SAT Double Tiles Path With Manual Cardinality Restrictions")
@@ -99,10 +104,8 @@ if SHOW_LITERAL_REPRESENTATION:
   print(" Maze's literals:", maze.get_maze_literals_representation(pretty=True), sep="\n")
 
 # Mostramos el laberinto sin resolver
-print(f" Maze [{maze.get_maze_width()}x{maze.get_maze_height()}]:", maze.get_maze_representation(pretty=True), sep="\n")
-
-
-
+if SHOW_MAZE_REPRESENTATION:
+  print(f" Maze [{maze.get_maze_width()}x{maze.get_maze_height()}]:", maze.get_maze_representation(pretty=True), sep="\n")
 
 
 # Preparamos las clausulas:
@@ -184,3 +187,6 @@ if SHOW_SOLVING_TIME:
 # print(maze.get_route_conditions(8, 1), end="\n\n")
 # print(maze.get_route_conditions(8, 4), end="\n\n")
 # print(maze.get_route_conditions(7, 4), end="\n\n")
+
+if SEND_OUTPUT_TO_FILE:
+  f.close()

@@ -83,7 +83,7 @@ class MazeSatLayeredTiles(Maze):
       literals = [(layer * self.__layer_length) + literal for layer in range(self.__layers)]
 
       for l in literals:
-        if l in model: return True
+        if model[l - 1] > 0: return True
       
       return False
 
@@ -112,7 +112,7 @@ class MazeSatLayeredTiles(Maze):
       for layer in range(self.__layers):
         for col_i in range(len(self._representation[row_i])):
           element = self._representation[row_i][col_i]
-          out += (Maze.WAY if self.get_literal_from_position(row_i, col_i, layer) in model else element) + " "
+          out += (Maze.WAY if model[self.get_literal_from_position(row_i, col_i, layer) - 1] > 0 else element) + " "
         out += "    "
       out += "\n"
 

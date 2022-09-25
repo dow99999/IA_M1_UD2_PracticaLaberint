@@ -77,7 +77,7 @@ class MazeSatDoubleTiles(Maze):
 
     for row in self._representation:
       for element in row:
-        out += (Maze.WAY if model_i in model else element) + " "
+        out += (Maze.WAY if model[model_i - 1] > 0 else element) + " "
         model_i += 1
       out += "\n"
 
