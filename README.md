@@ -47,9 +47,9 @@ u    #
 ## Configuració del programa
 Per canviar el funcionament de l'script es pot modificar l'arxiu `constants.py`.  
 Dins l'arxiu ja està definit que fa cada variable, però de forma genèrica es pot modificar:
-* veure diferents representacions del laberint
-* veure informació extra de la resolució del laberint
-* forçar un cicle dins el laberint
+* Veure diferents representacions del laberint
+* Veure informació extra de la resolució del laberint
+* Forçar un cicle dins el laberint
 * Canviar les caselles utilitzades per generar un cicle.
 
 Hi ha també la opció de canviar el laberint per defecte i la llista d'experiments, però es recomana no canviar aquests paràmetres.
