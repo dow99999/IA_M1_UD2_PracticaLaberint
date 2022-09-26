@@ -25,6 +25,8 @@ L'execució es fa a través de l'script `maze_solver.py`, passant com a paràmet
 6. Experiment MaxSAT que genera un camí d'**una direccio** utilitzant **diferents capes** del mateix laberint
 
 ### Arxius de laberint
+> Dins la carpeta `./data/` es troben un seguit d'exemples d'arxius de laberint  
+
 Dins la pràctica s'utilitza l'extensió `.mz` per aquest tipus d'arxius, però es pot utilitzar qualsevol arxiu de text pla.  
 L'estructura de l'arxiu es la següent:
 * Primera linea: un seguit de 4 caràcters que definiran, en ordre, l'usuari, els objectius, els camins i les parets.
