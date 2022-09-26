@@ -58,6 +58,6 @@ Dins l'arxiu ja està definit que fa cada variable, però de forma genèrica es 
 Hi ha també la opció de canviar el laberint per defecte i la llista d'experiments, però es recomana no canviar aquests paràmetres.
 
 ## Utilitats
-Existeixen dos scripts d'utilitat dins la carpeta `utils/`:
+Existeixen dos scripts d'utilitat:
 * `maze_representator.py`: mostra un laberint amb una solucio passada com a paràmetre (.json amb el model) i opcionalment un arxiu de laberint.
 * `maxhs_model_parser.py`: genera un arxiu de model (.json) a partir de una solució donada per MaxHS passada com a paràmetre a travès d'un arxiu de text pla amb 0s i 1s.
