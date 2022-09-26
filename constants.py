@@ -1,12 +1,30 @@
 from Maze import Maze as M
 
-# Solver a utilizar
+### Solver a utilizar
 SOLVER_NAME = "g4" 
 
 
-# Guarda el output del programa en un archivo de texto (output.txt)
+#####################################################################################################################
+# Generacion de archivos de datos
+###
+
+# Guarda las clausulas generadas por un experimento en un archivo (clauses.cnf | clauses.wcnf)
+SAVE_CLAUSES_TO_FILE = False
+
+# Guarda el modelo que soluciona el experimento en un archivo .json (solution.json)
+DUMP_MODEL_TO_FILE = False
+
+# Guarda el output del programa en un archivo de texto (output.log)
 SEND_OUTPUT_TO_FILE = False
 
+# Todos los archivos de salida se guardaran dentro de esta carpeta
+OUTPUT_DIR = "./out_files/"
+
+
+
+#####################################################################################################################
+# Opciones de visualizacion
+###
 
 # Mostrar el laberinto sin resolver
 SHOW_MAZE_REPRESENTATION = True
@@ -22,6 +40,10 @@ SHOW_MAZE_LAYERED_SOLUTION = True
 
 
 
+#####################################################################################################################
+# Opciones de visualizacion
+###
+
 # Muestra el numero total de clausulas generadas
 SHOW_CLAUSE_NUMBER = True
 
@@ -35,6 +57,9 @@ SHOW_PATH_LENGTH = True
 SHOW_MODEL_COST = True
 
 
+#####################################################################################################################
+# Opciones de generacion de ciclos
+###
 
 # Fuerza un loop en el modelo
 FORCE_LOOP = False          # Usando una casilla, para las resoluciones LAYERED
@@ -44,6 +69,11 @@ LOOP_TILE_WEIGHT = 1        # Peso de una casilla de generacion de ciclos, usado
 # Peso general de crear una casilla, usado para las soluciones MaxSAT
 GENERAL_TILE_WEIGHT = 2
 
+
+
+#####################################################################################################################
+# Configuracion general del programa
+###
 
 # Representacion del laberinto en una matriz por tipos
 MAZE_MATRIX = [
@@ -78,6 +108,11 @@ OPTIONS = [
 #####################################
 
 assert (not (FORCE_LOOP and FORCE_LAYERED_LOOP)), "Check constants, FORCE_LOOP and FORCE_LAYERED_LOOP can't be true at the same time"
+
+
+#####################################################################################################################
+# Datos especificos de la generacion de ciclos
+###
 
 # Aqui se pueden cambiar las casillas que generan un loop segun resolucion usada, ya estan colocadas para formar un ciclo con las distintas soluciones
 LOOP_CLAUSES = []

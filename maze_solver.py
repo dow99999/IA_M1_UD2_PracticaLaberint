@@ -26,6 +26,7 @@ x: wall
 
 import sys
 import time
+import json
 
 from pysat.solvers import Solver
 from pysat.examples.rc2 import RC2
@@ -36,7 +37,7 @@ from constants import *
 
 
 if SEND_OUTPUT_TO_FILE:
-  f = open('output.txt','w', encoding="utf-8")
+  f = open(OUTPUT_DIR + 'output.log','w', encoding="utf-8")
   sys.stdout = f
 
 if len(sys.argv) not in [2, 3] or sys.argv[1] not in OPTIONS:
@@ -137,6 +138,8 @@ if USING_MAXSAT:
   else:
     multipurpose_cnf.extend([[-x] for x in range(1, maze_l + 1)], weights=[GENERAL_TILE_WEIGHT] * maze_l)
 
+if SAVE_CLAUSES_TO_FILE:
+  multipurpose_cnf.to_file(OUTPUT_DIR + "clauses." + ("w" if USING_MAXSAT else "") + "cnf")
 
 # Inicializamos el solver con las restricciones ya generadas
 solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
@@ -154,6 +157,12 @@ else:
 
 f_time = time.time_ns() - i_time
 
+
+
+if DUMP_MODEL_TO_FILE:
+  model_f = open(OUTPUT_DIR + "model.json", "w")
+  model_f.write(json.dumps(model))
+  model_f.close()
 
 
 if model is not None:
