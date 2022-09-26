@@ -4,7 +4,8 @@ import json
 from constants import *
 
 f = open(sys.argv[1])
-maxhs_solution = ""
+maxhs_solution = f.read()
+f.close()
 
 model = []
 for i in range(1, len(maxhs_solution) + 1):
