@@ -49,9 +49,15 @@ u    #
 ## Configuració del programa
 Per canviar el funcionament de l'script es pot modificar l'arxiu `constants.py`.  
 Dins l'arxiu ja està definit que fa cada variable, però de forma genèrica es pot modificar:
+* Generar arxius de dades
 * Veure diferents representacions del laberint
 * Veure informació extra de la resolució del laberint
 * Forçar un cicle dins el laberint
 * Canviar les caselles utilitzades per generar un cicle.
 
 Hi ha també la opció de canviar el laberint per defecte i la llista d'experiments, però es recomana no canviar aquests paràmetres.
+
+## Utilitats
+Existeixen dos scripts d'utilitat dins la carpeta `utils/`:
+* `maze_representator.py`: mostra un laberint amb una solucio passada com a paràmetre (.json amb el model) i opcionalment un arxiu de laberint.
+* `maxhs_model_parser.py`: genera un arxiu de model (.json) a partir de una solució donada per MaxHS passada com a paràmetre a travès d'un arxiu de text pla amb 0s i 1s.
