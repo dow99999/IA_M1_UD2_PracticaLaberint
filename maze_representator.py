@@ -2,20 +2,31 @@ import sys
 import json
 
 from constants import *
-from MazeSatDoubleTiles import MazeSatDoubleTiles as M
 
-if len(sys.argv) not in [2, 3]:
-  print("usage: maze_representator.py <model_path> [maze_path]")
+if len(sys.argv) not in [3, 4]:
+  print("usage: maze_representator.py <maze_algorithm_id> <model_path> [maze_path]")
+  print("Maze Algorithms:")
+  print(" 1. Double Tiles")
+  print(" 2. Layered Tiles")
   exit()
 
-model_f = open(sys.argv[1], "r")
+model_f = open(sys.argv[2], "r")
 model = json.loads(str(model_f.read()))
 model_f.close()
 
+
+if sys.argv[1] == "1":
+  from MazeSatDoubleTiles import MazeSatDoubleTiles as M
+elif sys.argv[1] == "2":
+  from MazeSatLayeredTiles import MazeSatLayeredTiles as M
+
 maze = M()
-if len(sys.argv) == 3:
-  maze.load_maze_from_file(sys.argv[2])
+
+
+if len(sys.argv) == 4:
+  maze.load_maze_from_file(sys.argv[3])
 else:
   maze.load_maze_from_matrix(MAZE_MATRIX)
+
 
 print(maze.get_maze_representation_with_path(model, pretty=True))
