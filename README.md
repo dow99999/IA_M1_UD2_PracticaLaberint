@@ -12,6 +12,10 @@ El problema que solucionarem consisteix a trobar alguna ruta des del punt inicia
 ```
 $ pip install python-sat
 ```
+* Mòdul de Python [PyPNG](https://pypng.readthedocs.io/en/latest/ex.html)
+```
+$ pip install pypng
+```
 
 ## Execució del programa
 L'execució es fa a través de l'script `maze_solver.py`, passant com a paràmetre l'identificador de l'experiment (número) i opcionalment la ruta d'un arxiu de laberint per utilitzar en comptes del laberint per defecte.
@@ -61,3 +65,5 @@ Hi ha també la opció de canviar el laberint per defecte i la llista d'experime
 Existeixen dos scripts d'utilitat:
 * `maze_representator.py`: mostra un laberint amb una solucio passada com a paràmetre (.json amb el model) i opcionalment un arxiu de laberint.
 * `maxhs_model_parser.py`: genera un arxiu de model (.json) a partir de una solució donada per MaxHS passada com a paràmetre a travès d'un arxiu de text pla amb 0s i 1s.
+* `maxcdcl.py`: necesita el binari de maxcdcl al mateix directori, l'executa y compta el temps d'execució
+* `maxhs.py`: necesita el binari de maxhs al mateix directori, l'executa y compta el temps d'execució
