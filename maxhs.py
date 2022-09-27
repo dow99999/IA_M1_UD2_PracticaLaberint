@@ -15,7 +15,7 @@ for i in range(1, len(sys.argv)):
 f_time = 0
 for i in range(TEST_ITERATIONS):
   i_time = time.time_ns()
-  os.system("./maxcdcl_static" + args)
+  os.system("./maxhs -printSoln" + args)
   f_time += time.time_ns() - i_time
 
 print("Solved", TEST_ITERATIONS, "iterations in", (f_time / 1000000) / 1000, "s")
