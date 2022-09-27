@@ -173,6 +173,10 @@ if model is not None:
   if SHOW_MAZE_SOLUTION:
     print(" Maze's possible solution:", maze.get_maze_representation_with_path(model, pretty=True), sep="\n")
   
+  if SAVE_MAZE_SOLUTION_TO_PNG:
+    maze.save_solved_maze_to_image(model)
+    print("Saved solved maze on " + OUTPUT_DIR + "solved_maze.png")
+
   # En caso de MaxSAT mostramos ademas el coste del camino
   if USING_MAXSAT and SHOW_MODEL_COST:
     print("Model cost:", solver.cost)

@@ -9,6 +9,14 @@ class Maze:
   USER = "¤"
   FLAG = "ƒ"
   WAY = "·"
+
+  COLORS = {
+    str(PATH): (200, 200, 200),
+    str(WALL): (0, 0, 0),
+    str(USER): (0, 0, 255),
+    str(FLAG): (255, 0, 0),
+    str(WAY): (0, 255, 0)
+  }
   
 
   def combinations_generator(elements: list, length: int):

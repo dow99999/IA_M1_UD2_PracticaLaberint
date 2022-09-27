@@ -9,13 +9,16 @@ SOLVER_NAME = "g4"
 ###
 
 # Guarda las clausulas generadas por un experimento en un archivo (clauses.cnf | clauses.wcnf)
-SAVE_CLAUSES_TO_FILE = False
+SAVE_CLAUSES_TO_FILE = True
 
 # Guarda el modelo que soluciona el experimento en un archivo .json (solution.json)
-DUMP_MODEL_TO_FILE = False
+DUMP_MODEL_TO_FILE = True
 
 # Guarda el output del programa en un archivo de texto (output.log)
-SEND_OUTPUT_TO_FILE = False
+SEND_OUTPUT_TO_FILE = True
+
+# Guarda la representacion del laberinto solucionado en un archivo de imagen(solved_maze.png)
+SAVE_MAZE_SOLUTION_TO_PNG = True
 
 # Todos los archivos de salida se guardaran dentro de esta carpeta
 OUTPUT_DIR = "./out_files/"
