@@ -1,10 +1,10 @@
 from Maze import Maze as M
 
 ### Solver a utilizar
-SOLVER_NAME = "g4" 
+SOLVER_NAME = "cd"
 
 # Iteraciones para las que se ejecutara el calculo de la solucion
-TEST_ITERATIONS = 1
+TEST_ITERATIONS = 100
 
 #####################################################################################################################
 # Generacion de archivos de datos
@@ -17,7 +17,7 @@ SAVE_CLAUSES_TO_FILE = True
 DUMP_MODEL_TO_FILE = True
 
 # Guarda el output del programa en un archivo de texto (output.log)
-SEND_OUTPUT_TO_FILE = True
+SEND_OUTPUT_TO_FILE = False
 
 # Guarda la representacion del laberinto solucionado en un archivo de imagen(solved_maze.png)
 SAVE_MAZE_SOLUTION_TO_PNG = True
@@ -32,16 +32,16 @@ OUTPUT_DIR = "./out_files/"
 ###
 
 # Mostrar el laberinto sin resolver
-SHOW_MAZE_REPRESENTATION = True
+SHOW_MAZE_REPRESENTATION = False
 
 # Mostrar los literales del laberinto
 SHOW_LITERAL_REPRESENTATION = False
 
 # Mostrar el laberinto resuelto
-SHOW_MAZE_SOLUTION = True
+SHOW_MAZE_SOLUTION = False
 
 # Mostrar la resolucion del laberinto separado por capas, en caso de que el experimento las use
-SHOW_MAZE_LAYERED_SOLUTION = True
+SHOW_MAZE_LAYERED_SOLUTION = False
 
 
 
