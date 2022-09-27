@@ -1,21 +1,55 @@
 # Este script necesita maxcdcl_static
-# No es muy fiable para tiempos pequenos, una sola ejecucion ya son 300ms aprox
+# El script utiliza python3
 
 import sys
+import subprocess
 import os
-import time
 
 from constants import *
 
+def decode_output(output: list):
+  for i in range(len(output)):
+    output[i] = output[i].decode("utf-8")
 
-args = ""
+def get_line_starting_with(output: list, target: str):
+  for i in range(len(output) - 1, -1, -1):
+    if output[i].startswith(target):
+      return output[i]
+
+def get_model_solution(output: list):
+  line = get_line_starting_with(output, "v ")
+  return line.split(" ")[1]
+
+def get_model_solving_time(output: list):
+  line = get_line_starting_with(output, "c CPU time")
+
+  return float((line.split(":")[1]).split(" ")[1])
+
+
+
+
+
+args = []
 for i in range(1, len(sys.argv)):
-  args += " " + sys.argv[i]
+  args.append(sys.argv[i])
 
 f_time = 0
 for i in range(TEST_ITERATIONS):
-  i_time = time.time_ns()
-  os.system("./maxcdcl_static" + args)
-  f_time += time.time_ns() - i_time
+  print(f"Processing iteration {i + 1}/{TEST_ITERATIONS}")
+  output = subprocess.check_output(["./maxcdcl_static"] + args)
+  output = output.splitlines(keepends=False)
+  decode_output(output)
 
-print("Solved", TEST_ITERATIONS, "iterations in", (f_time / 1000000) / 1000, "s")
+  f_time += get_model_solving_time(output)
+
+with open(OUTPUT_DIR + "maxcdcl_sol.temp", "w") as f:
+  f.write(get_model_solution(output))
+  f.close()
+
+os.system("python3 maxsat_model_parser.py " + OUTPUT_DIR + "/maxcdcl_sol.temp")
+
+os.remove(OUTPUT_DIR + "maxcdcl_sol.temp")
+
+
+
+print("Solved", TEST_ITERATIONS, "iterations in", f_time, "s")

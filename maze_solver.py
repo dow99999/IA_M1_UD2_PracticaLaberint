@@ -144,6 +144,8 @@ if SAVE_CLAUSES_TO_FILE:
 
 f_time = 0
 for i in range(TEST_ITERATIONS):
+  print(f"Processing iteration {i + 1}/{TEST_ITERATIONS}")
+
   i_time = time.time_ns()
 
   # Inicializamos el solver con las restricciones ya generadas
