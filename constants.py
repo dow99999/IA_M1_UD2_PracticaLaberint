@@ -23,7 +23,7 @@ OUTPUT_DIR = "./out_files/"
 
 
 #####################################################################################################################
-# Opciones de visualizacion
+# Opciones de visualizacion de laberintos
 ###
 
 # Mostrar el laberinto sin resolver
@@ -41,7 +41,7 @@ SHOW_MAZE_LAYERED_SOLUTION = True
 
 
 #####################################################################################################################
-# Opciones de visualizacion
+# Opciones de visualizacion de variables
 ###
 
 # Muestra el numero total de clausulas generadas
