@@ -1,3 +1,8 @@
+from constants import *
+
+if SAVE_MAZE_SOLUTION_TO_PNG:
+  import png
+
 from Maze import Maze
 
 from pysat import card
@@ -120,7 +125,31 @@ class MazeSatLayeredTiles(Maze):
 
     return out if not pretty else self._box_maze(out)
 
+  def save_solved_maze_to_image(self, model: list):
+    pixel_matrix = []
+    model_i = 1
 
+    def checkOnAllLayers(literal, model):
+      literals = [(layer * self.__layer_length) + literal for layer in range(self.__layers)]
+
+      for l in literals:
+        if model[l - 1] > 0: return True
+      
+      return False
+
+    for row_i in range(len(self._representation)):
+      pixel_matrix.append([])
+      for col_i in range(len(self._representation[row_i])):
+        colors = self.COLORS[self._representation[row_i][col_i]] if self._representation[row_i][col_i] in [self.FLAG, self.USER] or not checkOnAllLayers(model_i, model) else self.COLORS[self.WAY]
+
+        pixel_matrix[len(pixel_matrix) - 1].append(colors[0])
+        pixel_matrix[len(pixel_matrix) - 1].append(colors[1])
+        pixel_matrix[len(pixel_matrix) - 1].append(colors[2])
+
+        model_i += 1
+        
+
+    png.from_array(pixel_matrix, "RGB").save(OUTPUT_DIR + "solved_maze.png")
 
 
 

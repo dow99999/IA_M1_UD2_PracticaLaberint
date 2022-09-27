@@ -30,3 +30,7 @@ else:
 
 
 print(maze.get_maze_representation_with_path(model, pretty=True))
+
+if True:
+  maze.save_solved_maze_to_image(model)
+  print("Saved solved maze on " + OUTPUT_DIR + "solved_maze.png")
