@@ -141,21 +141,22 @@ if USING_MAXSAT:
 if SAVE_CLAUSES_TO_FILE:
   multipurpose_cnf.to_file(OUTPUT_DIR + "clauses." + ("w" if USING_MAXSAT else "") + "cnf")
 
-# Inicializamos el solver con las restricciones ya generadas
-solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
 
+f_time = 0
+for i in range(TEST_ITERATIONS):
+  i_time = time.time_ns()
 
+  # Inicializamos el solver con las restricciones ya generadas
+  solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
 
-i_time = time.time_ns()
+  # Resolvemos el laberinto y obtenemos el modelo, diferenciando entre una resolucion SAT y una MaxSAT:
+  if not USING_MAXSAT:
+    solver.solve()
+    model = solver.get_model()
+  else:
+    model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
 
-# Resolvemos el laberinto y obtenemos el modelo, diferenciando entre una resolucion SAT y una MaxSAT:
-if not USING_MAXSAT:
-  solver.solve()
-  model = solver.get_model()
-else:
-  model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
-
-f_time = time.time_ns() - i_time
+  f_time += time.time_ns() - i_time
 
 
 
@@ -193,7 +194,7 @@ if SHOW_CLAUSE_NUMBER:
   print("Number of clauses:", len(multipurpose_cnf.clauses) if type(multipurpose_cnf) is CNF else (len(multipurpose_cnf.hard) + len(multipurpose_cnf.soft)))
 
 if SHOW_SOLVING_TIME:
-  print("Solving time:", f_time / 1000000, "ms")
+  print("Solving time for " + str(TEST_ITERATIONS) + " iterations:", (f_time / 1000000) / 1000, "s")
 
 # Testing key position's clauses
 # print(maze.get_route_conditions(8, 0), end="\n\n")

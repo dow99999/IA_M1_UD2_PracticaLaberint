@@ -3,6 +3,8 @@ from Maze import Maze as M
 ### Solver a utilizar
 SOLVER_NAME = "g4" 
 
+# Iteraciones para las que se ejecutara el calculo de la solucion
+TEST_ITERATIONS = 1
 
 #####################################################################################################################
 # Generacion de archivos de datos
