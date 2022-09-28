@@ -149,16 +149,17 @@ for i in range(TEST_ITERATIONS):
   i_time = time.time_ns()
 
   # Inicializamos el solver con las restricciones ya generadas
-  solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME)
+  solver = RC2(multipurpose_cnf, solver=SOLVER_NAME) if USING_MAXSAT else Solver(bootstrap_with=multipurpose_cnf, name=SOLVER_NAME, use_timer=True)
 
   # Resolvemos el laberinto y obtenemos el modelo, diferenciando entre una resolucion SAT y una MaxSAT:
   if not USING_MAXSAT:
     solver.solve()
+    f_time += solver.time() * 1000000000    # Pasamos de segundos a nanosegundos para mantener una misma unidad
     model = solver.get_model()
   else:
     model = solver.compute()  # en caso de MaxSAT resolvemos aqui el laberinto
+    f_time += time.time_ns() - i_time
 
-  f_time += time.time_ns() - i_time
 
 
 
