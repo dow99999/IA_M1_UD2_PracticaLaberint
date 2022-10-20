@@ -96,7 +96,7 @@ class MazeSatDoubleTiles(Maze):
     for row_i in range(len(self._representation)):
       pixel_matrix.append([])
       for col_i in range(len(self._representation[row_i])):
-        colors = self.COLORS[self._representation[row_i][col_i]] if self._representation[row_i][col_i] in [self.FLAG, self.USER] or model[model_i - 1] < 0 else self.COLORS[self.WAY]
+        colors = self.COLORS[self._representation[row_i][col_i]] if model[model_i - 1] < 0 else Maze.color_merger(self.COLORS[self.WAY], self.COLORS[self._representation[row_i][col_i]])
 
         pixel_matrix[len(pixel_matrix) - 1].append(colors[0])
         pixel_matrix[len(pixel_matrix) - 1].append(colors[1])

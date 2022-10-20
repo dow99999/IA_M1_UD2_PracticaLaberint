@@ -18,7 +18,9 @@ class Maze:
     str(WAY): (0, 255, 0)
   }
   
-
+  def color_merger(col1, col2):
+    return ((col1[0] + col2[0]) // 2), ((col1[1] + col2[1]) // 2), ((col1[2] + col2[2]) // 2)
+    
   def combinations_generator(elements: list, length: int):
     """
     Devuelve una lista con todas las combinaciones sin repeticiones de length longitud posibles de todos los elementos de elements
