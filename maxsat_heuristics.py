@@ -1,3 +1,5 @@
+import json
+
 from MazeSatDoubleTiles import MazeSatDoubleTiles
 
 
@@ -24,6 +26,8 @@ def maxsat_clauses_with_heuristic(wcnf: WCNF, maze: MazeSatDoubleTiles):
     min(targets_x)
   ]
 
+  representation = []
+
   for i in range(1, maze_l + 1):
     pos = maze.get_position_from_literal(i)
     weight = 1
@@ -31,7 +35,6 @@ def maxsat_clauses_with_heuristic(wcnf: WCNF, maze: MazeSatDoubleTiles):
     # Pesos por distancias a los objectivos
     for f in flags:
       weight += manhattan_distance(pos, f)
-
 
     out_multiplier = 0
     # Pesos por salir del rectangulo
@@ -47,7 +50,17 @@ def maxsat_clauses_with_heuristic(wcnf: WCNF, maze: MazeSatDoubleTiles):
 
     weight += out_multiplier * weight
 
+    print(pos, weight)
+
+    if len(representation) <= pos[0]:
+      representation.append([])
+    
+    representation[pos[0]].append(weight)
+
     wcnf.append([-i], weight=weight)
+
+  for i in representation:
+    print(i)
 
 
 def manhattan_distance(current, target):
