@@ -32,25 +32,30 @@ def maxsat_clauses_with_heuristic(wcnf: WCNF, maze: MazeSatDoubleTiles):
     pos = maze.get_position_from_literal(i)
     weight = 1
 
-    # Pesos por distancias a los objectivos
-    for f in flags:
-      weight += manhattan_distance(pos, f)
+    # Pesos por distancias a los objetivos
+    if False:
+      for f in flags:
+        weight += manhattan_distance(pos, f)
 
-    out_multiplier = 0
-    # Pesos por salir del rectangulo
-    if pos[0] > rects[1]:
-      out_multiplier += pos[0] - rects[1]
-    if pos[0] < rects[3]:
-      out_multiplier += rects[3] - pos[0]
+    if False:
+      weight += manhattan_distance(pos, user)
 
-    if pos[1] < rects[0]:
-      out_multiplier += rects[0] - pos[1]
-    if pos[1] > rects[2]:
-      out_multiplier += pos[1] - rects[2]
+    if False:
+      out_multiplier = 0
+      # Pesos por salir del rectangulo
+      if pos[0] > rects[1]:
+        out_multiplier += pos[0] - rects[1]
+      if pos[0] < rects[3]:
+        out_multiplier += rects[3] - pos[0]
 
-    weight += out_multiplier * weight
+      if pos[1] < rects[0]:
+        out_multiplier += rects[0] - pos[1]
+      if pos[1] > rects[2]:
+        out_multiplier += pos[1] - rects[2]
 
-    print(pos, weight)
+      weight += out_multiplier * weight
+
+    # print(pos, weight)
 
     if len(representation) <= pos[0]:
       representation.append([])
